@@ -1,8 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
-
 import {Client4} from 'mattermost-redux/client';
 
 import store from 'stores/redux_store.jsx';
