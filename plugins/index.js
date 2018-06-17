@@ -8,6 +8,7 @@ import {ActionTypes} from 'utils/constants.jsx';
 import messageHtmlToComponent from 'utils/message_html_to_component';
 import {getSiteURL} from 'utils/url.jsx';
 import {formatText} from 'utils/text_formatting.jsx';
+import PluginRegistry from 'plugins/registry';
 
 window.plugins = {};
 
@@ -88,7 +89,8 @@ export function loadPlugin(manifest) {
         // Initialize the plugin
         console.log('Registering ' + manifest.id + ' plugin...'); //eslint-disable-line no-console
         const plugin = window.plugins[manifest.id];
-        plugin.initialize(registerComponents.bind(null, manifest.id), store);
+        const registry = new PluginRegistry(manifest.id);
+        plugin.initialize(registry);
         console.log('...done'); //eslint-disable-line no-console
     }
 

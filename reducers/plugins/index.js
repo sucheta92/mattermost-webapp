@@ -27,6 +27,23 @@ function removePluginComponents(state, action) {
     return state;
 }
 
+function removePluginComponent(state, action) {
+    const id = action.id;
+    const types = Object.keys(state);
+    for (let i = 0; i < types.length; i++) {
+        const componentType = types[i];
+        const componentList = state[componentType] || [];
+        for (let j = 0; j < componentList.length; j++) {
+            if (componentList[j].id === id) {
+                const nextArray = [...componentList];
+                nextArray.splice(j, 1);
+                return {...state, [componentType]: nextArray};
+            }
+        }
+    }
+    return state;
+}
+
 function removeMainMenuAction(state, action) {
     if (!action.data) {
         return state;
@@ -71,12 +88,17 @@ function plugins(state = {}, action) {
 
 function components(state = {}, action) {
     switch (action.type) {
-    case ActionTypes.RECEIVED_PLUGIN_COMPONENTS: {
-        if (action.data) {
-            return {...action.data, ...state};
+    case ActionTypes.RECEIVED_PLUGIN_COMPONENT: {
+        if (action.name && action.data) {
+            const nextState = {...state};
+            const nextArray = nextState[action.name] || [];
+            nextState[action.name] = [...nextArray, action.data];
+            return nextState;
         }
         return state;
     }
+    case ActionTypes.REMOVED_PLUGIN_COMPONENT:
+        return removePluginComponent(state, action);
     case ActionTypes.RECEIVED_WEBAPP_PLUGIN:
     case ActionTypes.REMOVED_WEBAPP_PLUGIN:
         return removePluginComponents(state, action);
@@ -87,7 +109,7 @@ function components(state = {}, action) {
 
 function postTypes(state = {}, action) {
     switch (action.type) {
-    case ActionTypes.RECEIVED_PLUGIN_POST_TYPES: {
+    case ActionTypes.RECEIVED_PLUGIN_POST_COMPONENT: {
         if (action.data) {
             return {...action.data, ...state};
         }
@@ -122,8 +144,8 @@ export default combineReducers({
     // object where every key is a plugin id and values are webapp plugin manifests
     plugins,
 
-    // object where every key is a component name and the values are components wrapped
-    // in an object that contains a plugin id
+    // object where every key is a component name and the values are arrays of
+    // components wrapped in an object that contains an id and plugin id
     components,
 
     // object where every key is a post type and the values are components wrapped in an
